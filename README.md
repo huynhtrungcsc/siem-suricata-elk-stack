@@ -122,6 +122,12 @@ grep 2100498 /var/log/suricata/fast.log
 
 ---
 
+## Troubleshooting
+
+If you encounter issues running the setup scripts or verifying the pipeline, see [TROUBLESHOOTING.md](TROUBLESHOOTING.md) for a full list of common errors, causes, and fixes — including Elasticsearch startup failures, Filebeat authentication errors, Suricata not detecting traffic, and Kibana slow start.
+
+---
+
 ## Contributing
 
 Contributions are welcome. Please read [CONTRIBUTING.md](CONTRIBUTING.md) before submitting a pull request.
