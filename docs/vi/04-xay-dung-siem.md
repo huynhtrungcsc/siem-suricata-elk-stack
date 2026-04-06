@@ -29,6 +29,25 @@ tags:
 
 ---
 
+## Mục lục
+
+- [Giới thiệu](#giới-thiệu)
+- [Yêu cầu](#yêu-cầu)
+- [Bước 1 — Cài đặt Elasticsearch và Kibana](#bước-1--cài-đặt-elasticsearch-và-kibana)
+- [Bước 2 — Cấu hình Elasticsearch](#bước-2--cấu-hình-elasticsearch)
+  - [Network](#network)
+  - [Tạo mật khẩu](#tạo-mật-khẩu)
+- [Bước 3 — Cấu hình Kibana](#bước-3--cấu-hình-kibana)
+  - [Tạo Encryption Keys](#tạo-encryption-keys)
+  - [Network Binding](#network-binding)
+  - [Xác thực (Phương pháp Keystore)](#xác-thực-phương-pháp-keystore)
+- [Bước 4 — Cài đặt và cấu hình Filebeat](#bước-4--cài-đặt-và-cấu-hình-filebeat)
+- [Bước 5 — Truy cập Kibana SIEM Dashboards](#bước-5--truy-cập-kibana-siem-dashboards)
+- [Các trường Elasticsearch Index quan trọng](#các-trường-elasticsearch-index-quan-trọng)
+- [Tóm tắt](#tóm-tắt)
+
+---
+
 ## Giới thiệu
 
 Các hướng dẫn trước đã đề cập cài đặt và vận hành Suricata như IDS/IPS. Hướng dẫn này tích hợp Suricata với **Elastic Stack** để tạo SIEM tập trung phục vụ lưu trữ, trực quan hóa và điều tra sự kiện bảo mật.
