@@ -104,6 +104,7 @@ Nếu đây là lần đầu bạn làm việc với Suricata hoặc Elastic Sta
 
 Nếu bạn đang tìm kiếm một chủ đề cụ thể:
 
+- **Cài đặt Suricata, cấu hình interface và ruleset** → [Phần 1](01-cai-dat-suricata.md)
 - **Cú pháp signature và viết custom rule** → [Phần 2](02-hieu-ve-signatures.md)
 - **Chuyển từ chỉ phát hiện sang chặn chủ động** → [Phần 3](03-cau-hinh-ips.md)
 - **Cài đặt và bảo mật Elasticsearch và Kibana** → [Phần 4](04-xay-dung-siem.md)
