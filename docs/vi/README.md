@@ -1,19 +1,8 @@
 <div align="center">
 
-# SIEM: Suricata + Elastic Stack
+# Tài liệu Tiếng Việt
 
-**Phát hiện, Ngăn chặn Xâm nhập Mạng và Phân tích Bảo mật Tập trung**
-
-Hướng dẫn triển khai hệ thống SIEM production-grade trên Ubuntu 20.04 LTS
-
-<br/>
-
-[![License: MIT](https://img.shields.io/badge/License-MIT-brightgreen.svg)](../../LICENSE)
-[![Phiên bản](https://img.shields.io/badge/phiên%20bản-1.0.0-blue.svg)]()
-[![Nền tảng](https://img.shields.io/badge/nền%20tảng-Ubuntu%2020.04%20LTS-E95420?logo=ubuntu&logoColor=white)]()
-[![Stack](https://img.shields.io/badge/stack-Suricata%20|%20Elasticsearch%20|%20Kibana%20|%20Filebeat-005571?logo=elastic&logoColor=white)]()
-
-<br/>
+**SIEM với Suricata và Elastic Stack — Series 5 Phần**
 
 [← Về trang chính](../../README.md) · [🇬🇧 Read in English](../en/README.md)
 
@@ -21,52 +10,15 @@ Hướng dẫn triển khai hệ thống SIEM production-grade trên Ubuntu 20.0
 
 ---
 
-## Mục lục
+Bộ tài liệu này hướng dẫn bạn xây dựng một hệ thống SIEM hoàn chỉnh, sẵn sàng cho production — bắt đầu từ một server Ubuntu 20.04 trống và kết thúc với một nền tảng phát hiện mối đe dọa, ngăn chặn xâm nhập và quản lý sự cố đang vận hành đầy đủ.
 
-- [Tổng quan](#tổng-quan)
-- [Kiến trúc hệ thống](#kiến-trúc-hệ-thống)
-- [Yêu cầu hệ thống](#yêu-cầu-hệ-thống)
-- [Nội dung tài liệu](#nội-dung-tài-liệu)
-- [Công nghệ sử dụng](#công-nghệ-sử-dụng)
-- [Tham chiếu nhanh](#tham-chiếu-nhanh)
-- [Ghi nhận](#ghi-nhận)
-
----
-
-## Tổng quan
-
-Bộ tài liệu này cung cấp hướng dẫn đầy đủ từ đầu đến cuối để triển khai hệ thống **Security Information and Event Management (SIEM)** sử dụng **Suricata** làm engine phát hiện và ngăn chặn mối đe dọa mạng, tích hợp với **Elastic Stack** (Elasticsearch, Kibana, Filebeat) trên Ubuntu 20.04 LTS.
-
-Tài liệu bao phủ toàn bộ vòng đời vận hành:
-
-| Giai đoạn | Phần | Mô tả |
-|---|---|---|
-| **Phát hiện** | Phần 1–2 | Triển khai Suricata, cấu hình signature, cập nhật ruleset |
-| **Ngăn chặn** | Phần 3 | Bật IPS mode, route traffic qua Suricata với NFQUEUE |
-| **Phân tích** | Phần 4–5 | Xây dựng SIEM với Elastic Stack, tạo detection rule và quản lý case |
-
----
-
-## Kiến trúc hệ thống
-
-```
-┌─────────────────────────────────────┐         ┌─────────────────────────────────────┐
-│           Suricata Server           │         │         Elasticsearch Server         │
-│                                     │         │                                     │
-│  Lưu lượng mạng ──► Suricata        │         │  Elasticsearch  ◄── Filebeat        │
-│                      (IDS/IPS)      │  Mạng   │       │                             │
-│                         │           │  nội bộ │       ▼                             │
-│                    eve.json         │         │  Kibana (port 5601)                 │
-│                         │           │         │   ├─ SIEM Dashboards               │
-│                         ▼           │         │   ├─ Detection Rules               │
-│                      Filebeat ──────────────► │   ├─ Timelines                     │
-│                                     │         │   └─ Case Management               │
-└─────────────────────────────────────┘         └─────────────────────────────────────┘
-```
+Mỗi phần được xây dựng trực tiếp trên phần trước. Đọc theo thứ tự khi lần đầu tiếp cận.
 
 ---
 
 ## Yêu cầu hệ thống
+
+Trước khi bắt đầu Phần 1, hãy đảm bảo cả hai server đáp ứng các yêu cầu sau.
 
 ### Suricata Server
 
@@ -75,8 +27,10 @@ Tài liệu bao phủ toàn bộ vòng đời vận hành:
 | Hệ điều hành | Ubuntu 20.04 LTS |
 | CPU | Tối thiểu 2 nhân |
 | RAM | Tối thiểu 4 GB |
-| Quyền truy cập | Người dùng non-root có `sudo` |
-| Tường lửa | UFW đã cấu hình và bật |
+| Disk | Tối thiểu 20 GB (để lưu trữ EVE log) |
+| Quyền truy cập | Người dùng non-root có quyền `sudo` |
+| Tường lửa | UFW đã cài đặt và bật |
+| Network interface | Đã xác định — chạy `ip link show` để kiểm tra |
 
 ### Elasticsearch Server
 
@@ -85,71 +39,76 @@ Tài liệu bao phủ toàn bộ vòng đời vận hành:
 | Hệ điều hành | Ubuntu 20.04 LTS |
 | CPU | Tối thiểu 2 nhân |
 | RAM | **Tối thiểu 4 GB** (khuyến nghị 8 GB) |
-| Quyền truy cập | Người dùng non-root có `sudo` |
+| Disk | Tối thiểu 50 GB (để lưu trữ event index) |
+| Quyền truy cập | Người dùng non-root có quyền `sudo` |
 | Mạng | Private IP có thể kết nối từ Suricata server |
 
-> **Lưu ý:** Có thể chạy tất cả dịch vụ trên một server cho mục đích thử nghiệm. Cấu hình hai server riêng biệt được khuyến nghị cho môi trường production để tránh tranh chấp tài nguyên giữa khối lượng kiểm tra packet của Suricata và JVM heap của Elasticsearch.
+> Có thể dùng cùng một máy cho môi trường lab và thử nghiệm. Với production, nên tách riêng: khối lượng kiểm tra packet của Suricata và JVM heap của Elasticsearch đều cần tối thiểu 4 GB RAM và cạnh tranh trực tiếp với nhau.
 
 ---
 
 ## Nội dung tài liệu
 
-| Phần | Tiêu đề | Thời gian | Mô tả |
+| Phần | Tiêu đề | Thời gian | Kết quả sau khi hoàn thành |
 |---|---|---|---|
-| [Phần 1](01-cai-dat-suricata.md) | **Cài đặt Suricata trên Ubuntu 20.04** | ~30 phút | Cài từ OISF PPA, cấu hình interface và Community Flow ID, tải ET Open ruleset, xác minh alert đầu tiên |
-| [Phần 2](02-hieu-ve-signatures.md) | **Hiểu về Suricata Signatures** | ~20 phút | Cấu trúc signature, action, header, option — viết custom rule phát hiện SSH, HTTP và TLS |
-| [Phần 3](03-cau-hinh-ips.md) | **Cấu hình Suricata như một IPS** | ~30 phút | Chuyển từ IDS sang IPS mode với NFQUEUE, route tất cả traffic qua Suricata, bảo toàn SSH access |
-| [Phần 4](04-xay-dung-siem.md) | **Xây dựng SIEM với Elastic Stack** | ~45 phút | Triển khai Elasticsearch và Kibana với xpack security, chuyển Suricata EVE log qua Filebeat |
-| [Phần 5](05-kibana-siem.md) | **Kibana SIEM: Rules, Timelines và Cases** | ~30 phút | Tạo detection rule, xây dựng timeline tương quan theo community_id, quản lý security case |
+| [Phần 1](01-cai-dat-suricata.md) | **Cài đặt Suricata trên Ubuntu 20.04** | ~30 phút | Suricata chạy ở IDS mode, ruleset ET Open kích hoạt, alert đầu tiên được xác minh |
+| [Phần 2](02-hieu-ve-signatures.md) | **Hiểu về Suricata Signatures** | ~20 phút | Custom rule phát hiện SSH brute-force, HTTP và TLS đã viết và kiểm tra |
+| [Phần 3](03-cau-hinh-ips.md) | **Cấu hình Suricata như một IPS** | ~30 phút | Suricata ở IPS mode — rule khớp sẽ chủ động chặn traffic |
+| [Phần 4](04-xay-dung-siem.md) | **Xây dựng SIEM với Elastic Stack** | ~45 phút | Elasticsearch + Kibana bảo mật bằng xpack; EVE log của Suricata chảy qua Filebeat |
+| [Phần 5](05-kibana-siem.md) | **Kibana SIEM: Rules, Timelines và Cases** | ~30 phút | Detection rule theo lịch, timeline điều tra tương quan và security case được quản lý |
 
-**Tổng thời gian ước tính:** ~2.5 giờ
-
----
-
-## Công nghệ sử dụng
-
-| Thành phần | Phiên bản | Vai trò |
-|---|---|---|
-| [Suricata](https://suricata.io) | 6.x | Engine phát hiện và ngăn chặn xâm nhập mạng |
-| [Elasticsearch](https://www.elastic.co/elasticsearch/) | 7.x | Lưu trữ, lập chỉ mục và tương quan sự kiện phân tán |
-| [Kibana](https://www.elastic.co/kibana) | 7.x | SIEM dashboard, detection rule, timeline và quản lý case |
-| [Filebeat](https://www.elastic.co/beats/filebeat) | 7.x | Thu thập và chuyển tiếp log nhẹ |
-| [ET Open Ruleset](https://rules.emergingthreats.net) | Mới nhất | Signature tình báo mối đe dọa từ cộng đồng (~30.000 rule) |
-| Ubuntu | 20.04 LTS | Hệ điều hành |
+**Tổng thời gian đọc và thực hành ước tính:** khoảng 2,5 giờ
 
 ---
 
 ## Tham chiếu nhanh
 
+Các lệnh bạn sẽ dùng xuyên suốt series này và trong vận hành hàng ngày.
+
 ```bash
-# Kiểm tra cấu hình Suricata trước khi áp dụng thay đổi
+# Kiểm tra cấu hình trước khi restart
 sudo suricata -T -c /etc/suricata/suricata.yaml -v
 
-# Cập nhật ruleset threat intelligence
+# Tải ruleset threat intelligence mới nhất
 sudo suricata-update
 
-# Tải lại rule mà không cần restart daemon
+# Tải lại rule mà không dừng daemon
 sudo kill -usr2 $(pidof suricata)
 
-# Kiểm tra trạng thái dịch vụ Suricata
+# Kiểm tra trạng thái dịch vụ
 sudo systemctl status suricata.service
 
-# Theo dõi log Suricata trong thời gian thực
+# Theo dõi log vận hành trong thời gian thực
 sudo tail -f /var/log/suricata/suricata.log
 
-# Truy vấn EVE log theo Suricata alert cụ thể (thay SID tùy ý)
-jq 'select(.alert .signature_id==2100498)' /var/log/suricata/eve.json
+# Tìm tất cả alert theo signature cụ thể
+jq 'select(.event_type=="alert") | {ts: .timestamp, src: .src_ip, sig: .alert.signature}' \
+  /var/log/suricata/eve.json
 
-# Kích hoạt alert test (khớp SID 2100498)
+# Kích hoạt alert test chuẩn (SID 2100498)
 curl http://testmynids.org/uid/index.html
+grep 2100498 /var/log/suricata/fast.log
+
+# Kiểm tra trạng thái Elasticsearch cluster
+curl -s -u elastic:<password> http://localhost:9200/_cluster/health | jq .
+
+# Liệt kê Filebeat modules đang kích hoạt
+sudo filebeat modules list
 ```
 
 ---
 
-## Ghi nhận
+## Thứ tự đọc
 
-Bộ tài liệu này được biên soạn với tham chiếu từ chuỗi hướng dẫn gốc của [**Jamon Camisso**](https://www.digitalocean.com/community/users/jamonation), đăng trên nền tảng [DigitalOcean Community](https://www.digitalocean.com/community). Nội dung trong repository này đã được tái cấu trúc độc lập, mở rộng đáng kể, dịch sang tiếng Việt, và bổ sung thêm ngữ cảnh lý thuyết, kinh nghiệm vận hành thực tế và tài liệu về lỗi thường gặp.
+Nếu đây là lần đầu bạn làm việc với Suricata hoặc Elastic Stack, hãy đọc tuần tự từ Phần 1 đến Phần 5. Mỗi phần giả định rằng hạ tầng từ phần trước đã được thiết lập.
+
+Nếu bạn đang tìm kiếm một chủ đề cụ thể:
+
+- **Cú pháp signature và viết custom rule** → [Phần 2](02-hieu-ve-signatures.md)
+- **Chuyển từ chỉ phát hiện sang chặn chủ động** → [Phần 3](03-cau-hinh-ips.md)
+- **Cài đặt và bảo mật Elasticsearch và Kibana** → [Phần 4](04-xay-dung-siem.md)
+- **Detection rule, timeline điều tra, quản lý case** → [Phần 5](05-kibana-siem.md)
 
 ---
 
-*[← Về trang chính Repository](../../README.md)*
+**[→ Bắt đầu từ Phần 1: Cài đặt Suricata trên Ubuntu 20.04](01-cai-dat-suricata.md)**
