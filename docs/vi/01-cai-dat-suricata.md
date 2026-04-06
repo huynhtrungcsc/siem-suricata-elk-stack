@@ -118,6 +118,8 @@ Community Flow ID cung cấp định danh nhất quán cho các network flow —
       community-id: true
 ```
 
+> **Tại sao điều này quan trọng:** Community Flow ID là một hash xác định của 5-tuple — giao thức, IP nguồn, port nguồn, IP đích, port đích — được tính theo một [đặc tả mở](https://github.com/corelight/community-id-spec) dùng chung giữa các công cụ bảo mật. Khi một kết nối xuất hiện trong Suricata alert, Filebeat log và Kibana timeline, cả ba công cụ đều tạo ra cùng một ID. Nếu không có nó, điều tra viên phải ghép nối sự kiện thủ công theo IP/port — cách tiếp cận này không thực tế ở quy mô lớn và hoàn toàn thất bại khi timestamp giữa các hệ thống lệch nhau dù chỉ vài millisecond.
+
 ### Cấu hình Network Interface
 
 Xác định network interface mặc định:
@@ -159,6 +161,8 @@ af-packet:
   - interface: default
 ```
 
+> **Lỗi thường gặp khi cấu hình:** Nếu Suricata khởi động không có lỗi nhưng không tạo alert nào, nguyên nhân phổ biến nhất là tên interface không khớp. Suricata sẽ không báo lỗi nếu interface được cấu hình không tồn tại — nó âm thầm không bắt gì cả. Tên interface thay đổi theo cloud provider và phiên bản kernel (`eth0`, `ens3`, `enp3s0`, `ens160`). Luôn xác minh bằng `ip -brief address show` và đối chiếu với tên trong `suricata.yaml`.
+
 ### Bật Live Rule Reloading
 
 Thêm vào cuối file:
@@ -185,6 +189,8 @@ Lưu và đóng file (`CTRL+X`, `Y`, `ENTER`).
 Suricata tích hợp `suricata-update` — công cụ quản lý ruleset từ các nguồn threat intelligence.
 
 Tải xuống **ET Open** ruleset từ Emerging Threats:
+
+> **Lý thuyết — tại sao ruleset cần cập nhật thường xuyên:** Signature chỉ có hiệu quả khi còn mới. Emerging Threats phát hành cập nhật rule nhiều lần mỗi tuần khi xuất hiện các mẫu tấn công mới, malware family và CVE mới. Trong môi trường production, chạy `suricata-update` hàng ngày qua cron job là thực hành tiêu chuẩn. Nếu không cập nhật, Suricata có thể bỏ sót các kỹ thuật tấn công mới được quan sát gần đây trong khi vẫn tiếp tục cảnh báo về các mẫu lỗi thời từ nhiều năm trước.
 
 ```bash
 sudo suricata-update
