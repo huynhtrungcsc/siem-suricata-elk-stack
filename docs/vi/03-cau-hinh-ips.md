@@ -28,6 +28,21 @@ tags:
 
 ---
 
+## Mục lục
+
+- [Giới thiệu](#giới-thiệu)
+- [Yêu cầu](#yêu-cầu)
+- [Bước 1 — Thêm Custom Signatures](#bước-1--thêm-custom-signatures)
+  - [Tìm IP public của server](#tìm-ip-public-của-server)
+  - [Tạo file rule nội bộ](#tạo-file-rule-nội-bộ)
+- [Bước 2 — Chuyển Action Signature sang drop](#bước-2--chuyển-action-signature-sang-drop)
+- [Bước 3 — Bật NFQUEUE Mode (IPS)](#bước-3--bật-nfqueue-mode-ips)
+- [Bước 4 — Cấu hình UFW Route Traffic qua Suricata](#bước-4--cấu-hình-ufw-route-traffic-qua-suricata)
+- [Bước 5 — Kiểm tra chặn traffic](#bước-5--kiểm-tra-chặn-traffic)
+- [Tóm tắt](#tóm-tắt)
+
+---
+
 ## Giới thiệu
 
 Mặc định, Suricata chạy ở chế độ **IDS** thụ động — quan sát traffic và tạo alert mà không chặn gì. Hướng dẫn này bao gồm việc chuyển sang **IPS mode** chủ động, cho phép Suricata drop hoặc reject các packet khớp trong thời gian thực.
