@@ -28,6 +28,21 @@ tags:
 
 ---
 
+## Table of Contents
+
+- [Introduction](#introduction)
+- [Prerequisites](#prerequisites)
+- [Step 1 — Adding Custom Signatures](#step-1--adding-custom-signatures)
+  - [Find Your Server's Public IP Addresses](#find-your-servers-public-ip-addresses)
+  - [Create a Local Rules File](#create-a-local-rules-file)
+- [Step 2 — Converting Signature Actions to drop](#step-2--converting-signature-actions-to-drop)
+- [Step 3 — Enabling NFQUEUE Mode (IPS)](#step-3--enabling-nfqueue-mode-ips)
+- [Step 4 — Configuring UFW to Route Traffic Through Suricata](#step-4--configuring-ufw-to-route-traffic-through-suricata)
+- [Step 5 — Testing Traffic Blocking](#step-5--testing-traffic-blocking)
+- [Summary](#summary)
+
+---
+
 ## Introduction
 
 By default, Suricata runs as a passive **IDS** — it observes traffic and generates alerts without blocking anything. This guide covers switching to active **IPS mode**, enabling Suricata to drop or reject matching packets in real time.
