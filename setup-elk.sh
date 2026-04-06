@@ -72,7 +72,7 @@ check_ram() {
   local ram_kb
   ram_kb=$(grep MemTotal /proc/meminfo | awk '{print $2}')
   local ram_gb=$(( ram_kb / 1024 / 1024 ))
-  if [[ "$ram_gb" -lt 3 ]]; then
+  if [[ "$ram_gb" -lt 4 ]]; then
     echo -e "  ${RED}✖  Warning: Only ${ram_gb} GB RAM detected.${NC}"
     echo -e "      Elasticsearch requires a minimum of 4 GB RAM."
     echo -e "      Continuing, but the service may fail to start."
@@ -104,6 +104,15 @@ wait_for_elasticsearch() {
 banner
 check_root
 check_ram
+
+# Gather Suricata server IP upfront (needed for UFW rule on port 9200)
+echo ""
+read -rp "  Enter the private IP of the Suricata server (e.g. 10.0.0.1): " SURICATA_IP
+if [[ ! "$SURICATA_IP" =~ ^[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}$ ]]; then
+  err "Invalid IP address: $SURICATA_IP"
+fi
+ok "Suricata server IP: ${BOLD}$SURICATA_IP${NC}"
+echo ""
 
 # ─── Step 1: System dependencies ──────────────────────────────────────────────
 step 1 "Installing system dependencies"
@@ -139,18 +148,19 @@ step 3 "Configuring Elasticsearch"
 
 ES_CONF="/etc/elasticsearch/elasticsearch.yml"
 
-# Enable xpack security and bind to localhost
-# (Filebeat connects via private network using the node's IP, but we bind
-#  Elasticsearch to localhost and let the firewall handle external access)
+# Enable xpack security and bind to loopback + all private network interfaces.
+# "_local_" = 127.0.0.1, "_site_" = private IPs (e.g. 10.x, 192.168.x).
+# This allows Kibana (localhost) and Filebeat (private network) to connect.
+# UFW controls external access — port 9200 is allowed only from Suricata server.
 if ! grep -q 'xpack.security.enabled' "$ES_CONF"; then
   cat >> "$ES_CONF" << 'EOF'
 
 # --- Added by setup-elk.sh ---
-network.host: localhost
+network.host: ["_local_", "_site_"]
 xpack.security.enabled: true
 EOF
   ok "xpack.security.enabled: true"
-  ok "network.host: localhost"
+  ok "network.host: [\"_local_\", \"_site_\"] — listens on loopback + private IPs"
 else
   ok "Elasticsearch already configured"
 fi
@@ -228,13 +238,13 @@ fi
 # Store kibana_system password in Kibana keystore (avoids plaintext in yml)
 info "Adding kibana_system password to Kibana keystore..."
 
-# Create keystore if it does not exist yet
-if ! /usr/share/kibana/bin/kibana-keystore list > /dev/null 2>&1; then
-  /usr/share/kibana/bin/kibana-keystore create > /dev/null 2>&1
-fi
+# Create keystore (no-op if it already exists)
+/usr/share/kibana/bin/kibana-keystore create 2>/dev/null || true
 
-echo "$KIBANA_SYSTEM_PASS" \
-  | /usr/share/kibana/bin/kibana-keystore add elasticsearch.password --stdin > /dev/null 2>&1
+# Add password — printf avoids the trailing newline that 'echo' would add
+# --force overwrites if the key already exists (safe on re-run)
+printf '%s' "$KIBANA_SYSTEM_PASS" \
+  | /usr/share/kibana/bin/kibana-keystore add elasticsearch.password --stdin --force > /dev/null 2>&1
 
 ok "Kibana keystore: elasticsearch.password stored (not in plaintext)"
 
@@ -261,9 +271,10 @@ ok "SSH (OpenSSH) — allowed"
 ufw allow 5601/tcp > /dev/null 2>&1
 ok "Kibana port 5601 — allowed"
 
-# Elasticsearch port 9200 is NOT opened to the internet on purpose.
-# Filebeat connects over the private network; Kibana connects via localhost.
-ok "Elasticsearch port 9200 — NOT exposed (localhost only — correct for security)"
+# Allow Elasticsearch from the Suricata server ONLY (Filebeat needs this)
+# Port 9200 is NOT open to the internet — only to this specific private IP
+ufw allow from "$SURICATA_IP" to any port 9200 > /dev/null 2>&1
+ok "Elasticsearch port 9200 — allowed from Suricata server ($SURICATA_IP) only"
 
 divider
 
