@@ -165,6 +165,9 @@ else
   ok "Elasticsearch already configured"
 fi
 
+info "Starting Elasticsearch — this may take 30–60 seconds on first boot..."
+warn "If it fails: check RAM (need ≥ 4 GB), port 9200 not already in use"
+warn "Diagnosis: sudo journalctl -u elasticsearch -n 50"
 systemctl daemon-reload > /dev/null
 systemctl enable elasticsearch > /dev/null 2>&1
 systemctl start elasticsearch
@@ -203,6 +206,7 @@ echo -e "  ${YELLOW}│${NC}  You will need the ${BOLD}elastic${NC} password whe
 echo -e "  ${YELLOW}│${NC}  setup-suricata.sh on the Suricata server."
 echo -e "  ${YELLOW}└───────────────────────────────────────────────────────────┘${NC}"
 echo ""
+read -rp "  Press ENTER to confirm you have saved the passwords above: " _CONFIRM
 
 divider
 
@@ -248,6 +252,8 @@ printf '%s' "$KIBANA_SYSTEM_PASS" \
 
 ok "Kibana keystore: elasticsearch.password stored (not in plaintext)"
 
+info "Starting Kibana — first boot can take 1–3 minutes. This is normal."
+warn "If the 90s wait times out: sudo journalctl -u kibana -n 50"
 systemctl daemon-reload > /dev/null
 systemctl enable kibana > /dev/null 2>&1
 systemctl start kibana
