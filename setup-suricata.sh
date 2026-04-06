@@ -92,6 +92,7 @@ if ! ip link show "$IFACE" &>/dev/null; then
   err "Interface '$IFACE' not found. Run 'ip link show' to list available interfaces."
 fi
 ok "Interface: ${BOLD}$IFACE${NC}"
+warn "Wrong interface = Suricata runs but detects nothing. Verify with: tcpdump -i $IFACE -c 5"
 
 echo ""
 read -rp "  Enter the private IP of the Elasticsearch server (e.g. 10.0.0.2): " ELK_IP
@@ -99,11 +100,13 @@ if [[ ! "$ELK_IP" =~ ^[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}$ ]]; then
   err "Invalid IP address: $ELK_IP"
 fi
 ok "Elasticsearch server: ${BOLD}$ELK_IP${NC}"
+warn "Wrong IP = Filebeat cannot connect. Verify reachability: curl http://$ELK_IP:9200"
 
 echo ""
 read -rsp "  Enter the 'elastic' user password (from setup-elk.sh): " ELASTIC_PASS
 echo ""
 ok "Credentials captured"
+warn "Wrong password = Filebeat auth failure (401). Check: sudo journalctl -u filebeat -n 30"
 
 divider
 
