@@ -70,6 +70,8 @@ Các hướng dẫn trước đã đề cập cài đặt và vận hành Surica
 
 ### Elasticsearch Server *(mới)*
 - Ubuntu 20.04 với tối thiểu **4 GB RAM** và **2 CPU**
+
+> **Tại sao 4 GB RAM là ngưỡng tối thiểu cứng:** Elasticsearch chạy trên Java Virtual Machine (JVM) và cấp phát heap memory khi khởi động — mặc định là nửa RAM hệ thống, tối đa 31 GB. Trên server 4 GB, Elasticsearch nhận khoảng 2 GB heap. Xuống dưới ngưỡng này gây ra garbage collection pause thường xuyên, biểu hiện là query chậm, Filebeat bị backlog và cuối cùng crash với lỗi OutOfMemoryError. Cho khối lượng công việc production ổn định với lưu lượng Suricata event cao, 8 GB là ngưỡng thực tế tối thiểu với JVM heap được đặt rõ ràng là 4 GB trong `/etc/elasticsearch/jvm.options`.
 - Người dùng non-root có `sudo`
 - Private IP address có thể liên lạc từ Suricata server
 
@@ -213,6 +215,8 @@ server.host: "your_private_ip"
 ### Xác thực (Phương pháp Keystore)
 
 Lưu thông tin xác thực vào keystore mã hóa của Kibana (ưu tiên hơn chỉnh sửa `kibana.yml` trực tiếp):
+
+> **Tại sao dùng keystore thay vì `kibana.yml`:** Nếu thông tin xác thực được ghi dưới dạng plaintext trong `kibana.yml`, bất kỳ ai có quyền đọc file đó — hoặc backup, log quản lý cấu hình, hoặc repository version control — đều có thể trích xuất chúng. Kibana keystore mã hóa các giá trị lưu trữ ở trạng thái nghỉ. Thông tin xác thực không bao giờ được ghi ra đĩa dưới dạng plaintext, và `kibana.yml` vẫn an toàn để commit hoặc chia sẻ. Đây là nguyên tắc tương tự file `.env` trong phát triển ứng dụng — secret không nên tồn tại trong file cấu hình có thể đọc bởi các tiến trình hoặc nhân viên khác.
 
 ```bash
 cd /usr/share/kibana/bin
