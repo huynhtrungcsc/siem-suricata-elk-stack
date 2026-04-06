@@ -76,6 +76,29 @@ Available in two languages:
 
 ---
 
+## Automated Setup
+
+Two shell scripts are provided to automate the installation process. Run them in order, each on the correct server.
+
+| Script | Run on | What it does |
+|---|---|---|
+| [`setup-elk.sh`](setup-elk.sh) | Elasticsearch Server | Installs Elasticsearch + Kibana, generates xpack passwords, configures UFW |
+| [`setup-suricata.sh`](setup-suricata.sh) | Suricata Server | Installs Suricata + Filebeat, configures interface and ruleset, connects to ELK |
+
+```bash
+# On the Elasticsearch server — run this first
+chmod +x setup-elk.sh
+sudo ./setup-elk.sh
+
+# On the Suricata server — run this after setup-elk.sh completes
+chmod +x setup-suricata.sh
+sudo ./setup-suricata.sh
+```
+
+> **Note:** `setup-elk.sh` generates and displays the `elastic` user password. Save it — you will be prompted for it when running `setup-suricata.sh`. Steps that cannot be automated (e.g. interface selection, IPS mode) are marked as **MANUAL STEP** inside each script.
+
+---
+
 ## Quick Start
 
 ```bash
