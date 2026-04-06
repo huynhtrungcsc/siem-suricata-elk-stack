@@ -29,6 +29,26 @@ tags:
 
 ---
 
+## Mục lục
+
+- [Giới thiệu](#giới-thiệu)
+- [Yêu cầu](#yêu-cầu)
+- [Bước 1 — Bật API Keys trong Elasticsearch](#bước-1--bật-api-keys-trong-elasticsearch)
+- [Bước 2 — Tạo Detection Rules trong Kibana](#bước-2--tạo-detection-rules-trong-kibana)
+  - [Truy cập Rules Dashboard](#truy-cập-rules-dashboard)
+  - [Cấu hình Custom Query Rule](#cấu-hình-custom-query-rule)
+  - [Xác định Rule Metadata](#xác-định-rule-metadata)
+- [Bước 3 — Tạo Timeline để điều tra Alerts](#bước-3--tạo-timeline-để-điều-tra-alerts)
+  - [Tạo traffic test](#tạo-traffic-test)
+  - [Thêm community_id vào bảng Alerts](#thêm-community_id-vào-bảng-alerts)
+  - [Thêm Alerts vào Timeline](#thêm-alerts-vào-timeline)
+  - [Cấu hình và lưu Timeline](#cấu-hình-và-lưu-timeline)
+- [Bước 4 — Tạo và Quản lý SIEM Cases](#bước-4--tạo-và-quản-lý-siem-cases)
+- [Quy trình điều tra](#quy-trình-điều-tra)
+- [Tóm tắt](#tóm-tắt)
+
+---
+
 ## Giới thiệu
 
 [Hướng dẫn trước](04-xay-dung-siem.md) đã thiết lập pipeline SIEM hoàn chỉnh — Suricata → Filebeat → Elasticsearch → Kibana. Hướng dẫn cuối cùng này sử dụng Security apps tích hợp của Kibana để:
