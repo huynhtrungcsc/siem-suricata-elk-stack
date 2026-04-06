@@ -29,6 +29,25 @@ tags:
 
 ---
 
+## Table of Contents
+
+- [Introduction](#introduction)
+- [Prerequisites](#prerequisites)
+- [Step 1 — Installing Elasticsearch and Kibana](#step-1--installing-elasticsearch-and-kibana)
+- [Step 2 — Configuring Elasticsearch](#step-2--configuring-elasticsearch)
+  - [Networking](#networking)
+  - [Generate Passwords](#generate-passwords)
+- [Step 3 — Configuring Kibana](#step-3--configuring-kibana)
+  - [Generate Encryption Keys](#generate-encryption-keys)
+  - [Network Binding](#network-binding)
+  - [Authentication (Keystore Method)](#authentication-keystore-method)
+- [Step 4 — Installing and Configuring Filebeat](#step-4--installing-and-configuring-filebeat)
+- [Step 5 — Accessing Kibana SIEM Dashboards](#step-5--accessing-kibana-siem-dashboards)
+- [Key Elasticsearch Index Fields](#key-elasticsearch-index-fields)
+- [Summary](#summary)
+
+---
+
 ## Introduction
 
 The previous guides covered installing and operating Suricata as an IDS/IPS. This guide integrates Suricata with the **Elastic Stack** to create a centralized SIEM for storing, visualizing, and investigating security events.
