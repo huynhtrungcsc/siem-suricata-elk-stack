@@ -113,6 +113,8 @@ Action xác định phản hồi của Suricata khi packet khớp signature:
 | `drop` | **Chỉ IPS** | Loại bỏ gói tin; TCP connection sẽ timeout |
 | `reject` | **Chỉ IPS** | Gửi TCP RST (TCP) hoặc ICMP unreachable (khác) rồi drop packet |
 
+> **Chiến lược vận hành — tại sao nên bắt đầu với `alert` trước khi dùng `drop`:** Trong production, luôn viết rule mới với action `alert` trước. Chạy trong vài ngày hoặc vài tuần để quan sát những gì khớp trong môi trường của bạn. False positive — lưu lượng hợp lệ bị gắn cờ nhầm — rất phổ biến khi triển khai rule lần đầu. Chuyển thẳng sang `drop` mà không có giai đoạn xác nhận này có nguy cơ chặn các dịch vụ quan trọng của doanh nghiệp. Vòng đời được khuyến nghị: `alert` (quan sát) → xác nhận → `drop` (thực thi).
+
 > **Quan trọng:** `drop` và `reject` không có tác dụng ở IDS mode — Suricata sẽ tạo alert thay thế. Cấu hình IPS mode được đề cập trong [Phần 3](03-cau-hinh-ips.md).
 
 ---
@@ -228,6 +230,8 @@ SID trùng lặp ngăn Suricata khởi động:
 ```
 [ERRCODE: SC_ERR_DUPLICATE_SIG(176)] - Duplicate signature "..."
 ```
+
+> **Lỗi thường gặp:** Lỗi này xảy ra khi SID trong `local.rules` trùng với SID trong `suricata.rules` (từ ET Open), hoặc khi copy rule từ internet mà không kiểm tra giá trị SID. Cách khắc phục đơn giản — thay đổi SID trong rule nội bộ sang bất kỳ giá trị nào trong phạm vi `1000000–1999999`. Dùng `grep -r "sid:NNNNNN" /var/lib/suricata/rules/` để kiểm tra xung đột trước khi thêm rule mới.
 
 `rev` theo dõi lịch sử phiên bản của rule:
 
