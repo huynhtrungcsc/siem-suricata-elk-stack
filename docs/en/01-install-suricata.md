@@ -28,6 +28,24 @@ tags:
 
 ---
 
+## Table of Contents
+
+- [Introduction](#introduction)
+- [Prerequisites](#prerequisites)
+- [Step 1 — Installing Suricata](#step-1--installing-suricata)
+- [Step 2 — Initial Configuration](#step-2--initial-configuration)
+  - [Enable Community Flow ID](#enable-community-flow-id-recommended)
+  - [Configure the Network Interface](#configure-the-network-interface)
+  - [Enable Live Rule Reloading](#enable-live-rule-reloading)
+- [Step 3 — Updating Rulesets](#step-3--updating-rulesets)
+- [Step 4 — Validating the Configuration](#step-4--validating-the-configuration)
+- [Step 5 — Starting Suricata](#step-5--starting-suricata)
+- [Step 6 — Testing Detection](#step-6--testing-detection)
+- [Step 7 — Handling Alerts](#step-7--handling-alerts)
+- [Summary](#summary)
+
+---
+
 ## Introduction
 
 **Suricata** is an open-source Network Security Monitoring (NSM) engine that inspects network traffic using community-maintained and user-defined signature rules. It can generate log events, trigger alerts, and drop malicious packets matching specific threat patterns.
