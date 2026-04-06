@@ -104,6 +104,7 @@ If this is your first time working with Suricata or the Elastic Stack, read sequ
 
 If you are looking for a specific topic:
 
+- **Installing Suricata, configuring interfaces and rulesets** → [Part 1](01-install-suricata.md)
 - **Signature syntax and custom rule writing** → [Part 2](02-understanding-signatures.md)
 - **Switching from detection-only to active blocking** → [Part 3](03-configure-ips.md)
 - **Elasticsearch and Kibana installation and security** → [Part 4](04-build-siem.md)
