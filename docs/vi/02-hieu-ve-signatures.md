@@ -27,6 +27,29 @@ tags:
 
 ---
 
+## Mục lục
+
+- [Giới thiệu](#giới-thiệu)
+- [Yêu cầu](#yêu-cầu)
+- [Cấu trúc Signature](#cấu-trúc-signature)
+- [Actions (Hành động)](#actions-hành-động)
+- [Headers (Phần mô tả lưu lượng)](#headers-phần-mô-tả-lưu-lượng)
+  - [Protocols](#protocols)
+  - [Cú pháp địa chỉ và port](#cú-pháp-địa-chỉ-và-port)
+  - [Chiều lưu lượng](#chiều-lưu-lượng)
+- [Options (Tùy chọn)](#options-tùy-chọn)
+  - [msg — Thông điệp mô tả alert](#msg--thông-điệp-mô-tả-alert)
+  - [content — Kiểm tra payload](#content--kiểm-tra-nội-dung-payload)
+  - [sid và rev](#sid-và-rev--signature-id-và-phiên-bản)
+  - [reference](#reference--tài-liệu-tham-khảo-ngoài)
+  - [classtype](#classtype--phân-loại-traffic)
+  - [target](#target--xác-định-host-nguồn-và-đích)
+- [Viết Custom Rules](#viết-custom-rules)
+- [Triển khai Custom Rules](#triển-khai-custom-rules)
+- [Tóm tắt](#tóm-tắt)
+
+---
+
 ## Giới thiệu
 
 [Hướng dẫn trước](01-cai-dat-suricata.md) đã đề cập cài đặt Suricata và tải ET Open ruleset với hơn 30.000 signature. Tuy nhiên, nhiều signature trong số đó có thể không phù hợp với môi trường của bạn.
