@@ -144,6 +144,8 @@ Expand **Advanced Settings** to optionally add:
 
 > **Note:** Allow up to 5 minutes for the first alerts to populate after rule activation.
 
+> **Why detection rules run on a schedule (not in real time):** Kibana's detection engine is not a streaming processor — it operates as a periodic scheduled job. At each interval (default: every 5 minutes), it runs a pre-defined KQL or EQL query against the Elasticsearch index, collects matching documents from the lookback window, and generates structured alerts. This design allows complex multi-field correlation queries that would be prohibitively expensive to evaluate on every incoming event. The trade-off is an inherent latency of up to one full schedule interval between an event occurring and its corresponding alert appearing. For time-critical detections, the interval can be reduced to 1 minute.
+
 Repeat this process for each additional Suricata SID you wish to monitor.
 
 ---
@@ -170,6 +172,8 @@ Allow a few minutes for the alert to process through Elasticsearch and appear in
 4. Close the modal.
 
 The Community Flow ID column now appears in the alerts table.
+
+> **Why `community_id` is the key correlation field:** A single attack event — one port scan, one exploitation attempt — typically generates multiple separate alerts from different Suricata rules (e.g., a TCP SYN alert, then an application-layer alert, then a C2 callback alert). Without a shared identifier, each alert appears as an isolated event. The Community Flow ID links all alerts that belong to the same network flow, allowing you to see the complete sequence of events in a timeline. This is especially valuable when a single intrusion chain spans multiple protocols or triggers rules from both `local.rules` and `suricata.rules`.
 
 ### Add Alerts to a Timeline
 
