@@ -159,6 +159,8 @@ drop tls any any -> 2001:DB8::1/32 !443 (msg:"TLS TRAFFIC on non-TLS port"; clas
 
 ## Bước 3 — Bật NFQUEUE Mode (IPS)
 
+> **Lý thuyết — af-packet vs NFQUEUE:** Suricata hỗ trợ hai chế độ bắt packet chính. Ở chế độ `af-packet`, Suricata nhận *bản sao* của mỗi packet trực tiếp từ network interface qua socket AF_PACKET của Linux kernel — có thể đọc và cảnh báo, nhưng không thể sửa đổi hoặc dừng packet gốc. Ở chế độ `nfqueue`, Netfilter framework của Linux chặn *packet thực sự* và giữ nó trong queue; Suricata đánh giá và đưa ra phán quyết (ACCEPT hoặc DROP) trước khi kernel quyết định tiếp theo. Đây là lý do tại sao rule `drop` không có tác dụng ở IDS/af-packet mode — không có packet gốc để loại bỏ, chỉ có bản sao.
+
 Suricata mặc định dùng `af-packet` mode (passive capture). Chuyển sang `nfqueue` mode để chặn và xử lý packet chủ động qua Netfilter framework của Linux:
 
 ```bash
@@ -223,6 +225,8 @@ Thêm **cùng block** vào `/etc/ufw/before6.rules` cho IPv6.
 | `FORWARD -j NFQUEUE` | Route traffic forward (gateway mode) qua Suricata |
 | `INPUT 2 -j NFQUEUE` | Route tất cả traffic vào còn lại qua Suricata |
 | `OUTPUT 2 -j NFQUEUE` | Route tất cả traffic ra còn lại qua Suricata |
+
+> **Kinh nghiệm thực tế:** Các rule SSH bypass là biện pháp an toàn quan trọng nhất khi triển khai Suricata ở IPS mode. Trong production, nếu Suricata crash hoặc dừng để bảo trì, toàn bộ traffic xếp hàng vào NFQUEUE mà không có tiến trình nhận sẽ bị kernel drop âm thầm — kể cả phiên SSH của bạn. Flag `--queue-bypass` yêu cầu Netfilter ACCEPT packet trực tiếp nếu queue không có consumer, về cơ bản bypass Suricata cho port cụ thể đó khi dịch vụ không hoạt động. Đây là biện pháp đã cứu nhiều kỹ sư khỏi phải dùng cloud console hoặc truy cập vật lý để khôi phục server bị khóa.
 
 > **Quan trọng:** Các rule SSH bypass đảm bảo quyền truy cập SSH được duy trì ngay cả khi Suricata dừng hoặc crash. Nếu thiếu, toàn bộ traffic sẽ bị xếp hàng vào NFQUEUE chết và bị drop — khóa hoàn toàn quyền truy cập server.
 
