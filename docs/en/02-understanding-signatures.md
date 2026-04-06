@@ -27,6 +27,29 @@ tags:
 
 ---
 
+## Table of Contents
+
+- [Introduction](#introduction)
+- [Prerequisites](#prerequisites)
+- [Signature Structure](#signature-structure)
+- [Actions](#actions)
+- [Headers](#headers)
+  - [Protocols](#protocols)
+  - [Address and Port Syntax](#address-and-port-syntax)
+  - [Direction](#direction)
+- [Options](#options)
+  - [msg — Alert Message](#msg--human-readable-alert-message)
+  - [content — Payload Inspection](#content--payload-inspection)
+  - [sid and rev](#sid-and-rev--signature-id-and-revision)
+  - [reference](#reference--external-documentation)
+  - [classtype](#classtype--traffic-classification)
+  - [target](#target--source-and-destination-host-identification)
+- [Writing Custom Rules](#writing-custom-rules)
+- [Deploying Custom Rules](#deploying-custom-rules)
+- [Summary](#summary)
+
+---
+
 ## Introduction
 
 The [previous guide](01-install-suricata.md) covered installing Suricata and loading the ET Open ruleset, which contains over 30,000 signatures. However, many of those signatures may not apply to your environment.
