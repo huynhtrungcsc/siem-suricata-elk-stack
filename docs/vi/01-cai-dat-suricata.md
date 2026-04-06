@@ -28,6 +28,24 @@ tags:
 
 ---
 
+## Mục lục
+
+- [Giới thiệu](#giới-thiệu)
+- [Yêu cầu](#yêu-cầu)
+- [Bước 1 — Cài đặt Suricata](#bước-1--cài-đặt-suricata)
+- [Bước 2 — Cấu hình ban đầu](#bước-2--cấu-hình-ban-đầu)
+  - [Bật Community Flow ID](#bật-community-flow-id-khuyến-nghị)
+  - [Cấu hình Network Interface](#cấu-hình-network-interface)
+  - [Bật Live Rule Reloading](#bật-live-rule-reloading)
+- [Bước 3 — Cập nhật Rulesets](#bước-3--cập-nhật-rulesets)
+- [Bước 4 — Kiểm tra cấu hình](#bước-4--kiểm-tra-cấu-hình)
+- [Bước 5 — Khởi chạy Suricata](#bước-5--khởi-chạy-suricata)
+- [Bước 6 — Kiểm tra phát hiện](#bước-6--kiểm-tra-phát-hiện)
+- [Bước 7 — Xử lý Alerts](#bước-7--xử-lý-alerts)
+- [Tóm tắt](#tóm-tắt)
+
+---
+
 ## Giới thiệu
 
 **Suricata** là công cụ Network Security Monitoring (NSM) mã nguồn mở, kiểm tra lưu lượng mạng dựa trên các signature rule được xây dựng bởi cộng đồng và người dùng. Suricata có khả năng tạo log sự kiện, kích hoạt cảnh báo và chặn các gói tin độc hại khớp với mẫu mối đe dọa cụ thể.
