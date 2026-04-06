@@ -113,6 +113,8 @@ The action determines Suricata's response when a packet matches the signature:
 | `drop` | **IPS only** | Silently discards the packet; TCP connections time out |
 | `reject` | **IPS only** | Sends TCP RST (TCP) or ICMP unreachable (other) and drops the packet |
 
+> **Operational strategy — why start with `alert` before `drop`:** In production, always write new rules with the `alert` action first. Run them for several days or weeks to observe what they match in your environment. False positives — legitimate traffic incorrectly flagged — are common when first deploying rules. Switching directly to `drop` without this validation period risks blocking business-critical services. The recommended lifecycle is: `alert` (observe) → validate → `drop` (enforce).
+
 > **Important:** `drop` and `reject` have no effect in IDS mode — Suricata will generate an alert instead. IPS mode configuration is covered in [Part 3](03-configure-ips.md).
 
 ---
@@ -228,6 +230,8 @@ Duplicate SIDs prevent Suricata from starting:
 ```
 [ERRCODE: SC_ERR_DUPLICATE_SIG(176)] - Duplicate signature "..."
 ```
+
+> **Common misconfiguration:** This error occurs when a SID in `local.rules` collides with one in `suricata.rules` (from ET Open) or when pasting rules from the internet without checking the SID value. The fix is straightforward — change the SID in your local rule to any value in the `1000000–1999999` range. Use `grep -r "sid:NNNNNN" /var/lib/suricata/rules/` to check for conflicts before adding a new rule.
 
 The `rev` keyword tracks the revision history of a rule:
 
