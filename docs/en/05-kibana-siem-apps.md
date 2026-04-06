@@ -29,6 +29,26 @@ tags:
 
 ---
 
+## Table of Contents
+
+- [Introduction](#introduction)
+- [Prerequisites](#prerequisites)
+- [Step 1 — Enabling API Keys in Elasticsearch](#step-1--enabling-api-keys-in-elasticsearch)
+- [Step 2 — Creating Detection Rules in Kibana](#step-2--creating-detection-rules-in-kibana)
+  - [Access the Rules Dashboard](#access-the-rules-dashboard)
+  - [Configure a Custom Query Rule](#configure-a-custom-query-rule)
+  - [Define Rule Metadata](#define-rule-metadata)
+- [Step 3 — Creating a Timeline to Investigate Alerts](#step-3--creating-a-timeline-to-investigate-alerts)
+  - [Generate Test Traffic](#generate-test-traffic)
+  - [Add community_id to the Alerts Table](#add-community_id-to-the-alerts-table)
+  - [Add Alerts to a Timeline](#add-alerts-to-a-timeline)
+  - [Configure and Save the Timeline](#configure-and-save-the-timeline)
+- [Step 4 — Creating and Managing SIEM Cases](#step-4--creating-and-managing-siem-cases)
+- [Investigation Workflow](#investigation-workflow)
+- [Summary](#summary)
+
+---
+
 ## Introduction
 
 The [previous guide](04-build-siem.md) established the full SIEM pipeline — Suricata → Filebeat → Elasticsearch → Kibana. This final guide uses Kibana's built-in Security apps to:
