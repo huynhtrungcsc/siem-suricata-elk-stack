@@ -118,6 +118,8 @@ Navigate to line 120 (`CTRL+_`, then type `120`):
       community-id: true
 ```
 
+> **Why this matters:** The Community Flow ID is a deterministic hash of the 5-tuple — protocol, source IP, source port, destination IP, destination port — computed using an [open specification](https://github.com/corelight/community-id-spec) shared across security tools. When a single connection appears in Suricata alerts, Filebeat logs, and Kibana timelines, all three produce the exact same ID. Without it, investigators must manually join events by IP/port combinations across systems — an approach that breaks down at scale and fails entirely when timestamps differ by even a few milliseconds.
+
 ### Configure the Network Interface
 
 Determine your default network interface:
@@ -159,6 +161,8 @@ To monitor **multiple interfaces**, add additional entries before `- interface: 
   - interface: default
 ```
 
+> **Common misconfiguration:** If Suricata starts without errors but generates no alerts, the most frequent cause is an interface name mismatch. Suricata will not report an error if the configured interface does not exist — it silently captures nothing. Interface names vary by cloud provider and kernel version (`eth0`, `ens3`, `enp3s0`, `ens160`). Always verify with `ip -brief address show` and cross-check against the name in `suricata.yaml`.
+
 ### Enable Live Rule Reloading
 
 Append the following to the end of the file:
@@ -185,6 +189,8 @@ Save and close the file (`CTRL+X`, `Y`, `ENTER`).
 Suricata includes `suricata-update`, a built-in tool to fetch and manage threat intelligence rulesets.
 
 Download the default **ET Open** ruleset from Emerging Threats:
+
+> **Background — why rulesets need regular updates:** Threat signatures are only effective when current. Emerging Threats releases rule updates multiple times per week as new attack patterns, malware families, and CVEs are published. In a production environment, running `suricata-update` daily via a cron job is standard practice. Without updates, Suricata may miss newly observed attack techniques while continuing to alert on outdated patterns from years prior.
 
 ```bash
 sudo suricata-update
