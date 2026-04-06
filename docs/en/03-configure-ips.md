@@ -159,6 +159,8 @@ drop tls any any -> 2001:DB8::1/32 !443 (msg:"TLS TRAFFIC on non-TLS port"; clas
 
 ## Step 3 — Enabling NFQUEUE Mode (IPS)
 
+> **Theory — af-packet vs NFQUEUE:** Suricata supports two primary capture modes. In `af-packet` mode, Suricata receives a *copy* of each packet directly from the network interface via the Linux kernel's AF_PACKET socket — it can read and alert, but cannot modify or stop the original packet. In `nfqueue` mode, the Linux Netfilter framework intercepts the *actual* packet and holds it in a queue; Suricata evaluates it and issues a verdict (ACCEPT or DROP) before the kernel decides what to do next. This is why `drop` rules have no effect in IDS/af-packet mode — there is no original packet to discard, only a copy.
+
 Suricata defaults to `af-packet` mode (passive capture). Switch to `nfqueue` mode to actively intercept and process packets via the Linux Netfilter framework:
 
 ```bash
@@ -224,7 +226,7 @@ Apply the **same block** to `/etc/ufw/before6.rules` for IPv6 traffic.
 | `INPUT 2 -j NFQUEUE` | Route all remaining inbound traffic through Suricata |
 | `OUTPUT 2 -j NFQUEUE` | Route all remaining outbound traffic through Suricata |
 
-> **Critical:** The SSH bypass rules ensure SSH access is preserved even if Suricata is stopped or crashes. Without them, all traffic would be queued to a dead NFQUEUE and dropped — locking you out of the server.
+> **Real-world experience:** The SSH bypass rules are the most critical safety measure when deploying Suricata in IPS mode. In production, if Suricata crashes or is stopped for maintenance, all traffic queued to NFQUEUE with no consumer is silently dropped by the kernel — this includes your SSH session. The `--queue-bypass` flag tells Netfilter to ACCEPT the packet directly if the queue has no consumer, effectively bypassing Suricata for that specific port when the service is down. This has saved many engineers from having to use a cloud console or physical access to recover a locked-out server.
 
 Reload UFW:
 
