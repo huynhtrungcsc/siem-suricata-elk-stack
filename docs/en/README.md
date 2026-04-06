@@ -1,22 +1,3 @@
----
-title: "SIEM with Suricata and Elastic Stack — English Documentation"
-description: "A complete step-by-step guide to deploying a production-grade SIEM system using Suricata IDS/IPS and the Elastic Stack on Ubuntu 20.04."
-date: 2022-03-01
-category: Security
-series: "SIEM with Suricata and Elastic Stack"
-language: English
-tags:
-  - suricata
-  - elasticsearch
-  - kibana
-  - filebeat
-  - siem
-  - ubuntu
-  - security
-  - ids
-  - ips
----
-
 <div align="center">
 
 # SIEM: Suricata + Elastic Stack
