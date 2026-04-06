@@ -70,6 +70,8 @@ The previous guides covered installing and operating Suricata as an IDS/IPS. Thi
 
 ### Elasticsearch Server *(new)*
 - Ubuntu 20.04 with **4 GB RAM** and **2 CPUs** minimum
+
+> **Why 4 GB RAM is a hard minimum:** Elasticsearch runs on the Java Virtual Machine (JVM) and allocates heap memory at startup — by default, half the system RAM, capped at 31 GB. On a 4 GB server, Elasticsearch receives approximately 2 GB of heap. Dropping below this causes frequent garbage collection pauses, which manifest as slow queries, indexing backlogs in Filebeat, and eventual OutOfMemoryError crashes. For sustained production workloads ingesting high-volume Suricata events, 8 GB is the practical minimum with the JVM heap explicitly set to 4 GB in `/etc/elasticsearch/jvm.options`.
 - Non-root user with `sudo` privileges
 - Private IP address reachable from the Suricata server
 
@@ -213,6 +215,8 @@ server.host: "your_private_ip"
 ### Authentication (Keystore Method)
 
 Store credentials in Kibana's encrypted keystore (preferred over editing `kibana.yml` directly):
+
+> **Why use the keystore instead of `kibana.yml`:** If credentials are written as plaintext in `kibana.yml`, anyone with read access to that file — or to a backup, a configuration management log, or a version control repository — can extract them. The Kibana keystore encrypts stored values at rest using the system's key. The credentials are never written to disk in plaintext, and `kibana.yml` remains safe to commit or share. This is the same principle behind `.env` files in application development — secrets should never live in configuration files that are readable by other processes or personnel.
 
 ```bash
 cd /usr/share/kibana/bin
