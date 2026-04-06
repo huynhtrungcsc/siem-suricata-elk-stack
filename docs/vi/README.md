@@ -1,22 +1,3 @@
----
-title: "SIEM với Suricata và Elastic Stack — Tài liệu Tiếng Việt"
-description: "Hướng dẫn từng bước triển khai hệ thống SIEM production-grade sử dụng Suricata IDS/IPS kết hợp Elastic Stack trên Ubuntu 20.04."
-date: 2022-03-01
-category: Bảo mật
-series: "SIEM với Suricata và Elastic Stack"
-language: Tiếng Việt
-tags:
-  - suricata
-  - elasticsearch
-  - kibana
-  - filebeat
-  - siem
-  - ubuntu
-  - bảo-mật
-  - ids
-  - ips
----
-
 <div align="center">
 
 # SIEM: Suricata + Elastic Stack
