@@ -162,7 +162,7 @@ divider
 step 5 "Downloading Emerging Threats Open ruleset"
 
 suricata-update > /dev/null 2>&1
-ok "Ruleset updated ($(ls /var/lib/suricata/rules/*.rules 2>/dev/null | wc -l) rule files)"
+ok "Ruleset updated ($(grep -c '^alert\|^drop\|^pass\|^reject' /var/lib/suricata/rules/suricata.rules 2>/dev/null || echo '0') rules loaded)"
 info "Schedule daily updates: sudo suricata-update (add to cron for production)"
 
 divider
@@ -247,18 +247,25 @@ if [[ -f "$SURICATA_MODULE" ]]; then
   ok "Suricata module configured (eve.json path: /var/log/suricata/eve.json)"
 fi
 
-# Load Kibana dashboards and Elasticsearch index templates
-info "Running 'filebeat setup' — loading dashboards and index templates..."
-info "This may take 60–90 seconds..."
-if filebeat setup -e > /tmp/filebeat_setup.log 2>&1; then
-  ok "Filebeat setup completed (dashboards and index templates loaded)"
+# Verify Kibana is reachable before running filebeat setup
+# (filebeat setup needs both Elasticsearch and Kibana to be available)
+info "Checking Kibana availability at http://${ELK_IP}:5601..."
+if curl -s --connect-timeout 10 "http://${ELK_IP}:5601/api/status" > /dev/null 2>&1; then
+  ok "Kibana is reachable"
+  info "Running 'filebeat setup' — loading dashboards and index templates..."
+  info "This may take 60–90 seconds..."
+  if filebeat setup -e > /tmp/filebeat_setup.log 2>&1; then
+    ok "Filebeat setup completed (dashboards and index templates loaded)"
+  else
+    warn "Filebeat setup reported issues. Run manually: sudo filebeat setup -e"
+    warn "See /tmp/filebeat_setup.log for error details."
+  fi
 else
-  warn "Filebeat setup reported issues. Manual check may be needed."
-  manual_note << 'EOF'
-Run this manually to load dashboards after confirming ELK is accessible:
+  warn "Kibana not reachable at ${ELK_IP}:5601 — skipping dashboard setup"
+  manual_note << 'MEOF'
+Kibana is not responding. Once it is running, load dashboards manually:
   sudo filebeat setup -e
-Check /tmp/filebeat_setup.log for the full error output.
-EOF
+MEOF
 fi
 
 systemctl enable filebeat > /dev/null 2>&1
